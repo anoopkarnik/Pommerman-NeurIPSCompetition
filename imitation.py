@@ -10,7 +10,6 @@ import torch
 import gym,random
 from pommerman import agents
 import pommerman
-from IPython.display import clear_output
 import os
 
 
@@ -102,7 +101,7 @@ model = DQN().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 action_loss = torch.nn.CrossEntropyLoss()
 value_loss = torch.nn.MSELoss()
-epochs = 10
+epochs = 1000
 batch_size = 512
 
 
@@ -122,20 +121,20 @@ def get_loss(p_output,v_output,p_target,v_target):
 accuracies = []
 for i in range(epochs):
     correct = 0 
-    total = 512
+    total = batch_size
     torch.cuda.empty_cache() 
     train_size = len(x_train)
     for j in range(int(train_size/batch_size)):
         optimizer.zero_grad()
-        x_batch_train = x_train[j*512:(j+1)*512,:,:,:,:]
-        p_target = p_train[j*512:(j+1)*512].view(-1)
-        v_target = v_train[j*512:(j+1)*512].view(-1)
+        x_batch_train = x_train[j*batch_size:(j+1)*batch_size,:,:,:,:]
+        p_target = p_train[j*batch_size:(j+1)*batch_size].view(-1)
+        v_target = v_train[j*batch_size:(j+1)*batch_size].view(-1)
         p_output,v_output = model(x_batch_train)
         loss = get_loss(p_output,v_output,p_target,v_target) 
         output = torch.max(p_output,1)[1]
         correct += torch.sum(torch.eq(output,p_target)).cpu().numpy()
         accuracy = 100.00 * correct/total
-        total += 512
+        total += batch_size
         loss.backward(retain_graph=True)
         optimizer.step() 
     with open("imitation.txt", "a") as f: print('train_accuracy of',i,'=',accuracy, file=f)
@@ -156,6 +155,7 @@ for i in range(epochs):
     if i>3:
         if accuracies[i]<= accuracies[i-1] and accuracies[i-1] <= accuracies[i-2] and accuracies[i-2] <= accuracies[i-3] :
             break
+    print(accuracy)
     with open("imitation.txt", "a") as f: print('test_accuracy of',i,'=',accuracy, file=f)
 with open("imitation.txt", "a") as f: print('final_test_accuracy =', max(accuracies),file=f)
 

@@ -41,7 +41,7 @@ def featurize(obs):
 # In[3]:
 
 
-num_episodes = 1500
+num_episodes = 150000
 discount = 0.9
 
 # Create a set of agents (exactly four)
@@ -98,11 +98,11 @@ for i in range(num_episodes):
         observations.append(observation_s)
         actions.append(action_s)
         rewards.append(reward_s)
-        if i % 500==0 and i!=0:
+        if i % 10000==0 and i!=0:
             out_file = 'train_data.npz'
             np.savez_compressed(out_file, observations=observations, actions=actions, rewards = rewards)
 
-num_episodes = 200
+num_episodes = 20000
 discount = 0.9
 
 # Create a set of agents (exactly four)
@@ -140,7 +140,7 @@ for i in range(num_episodes):
         obs = deepcopy(new_obs)
         reward = deepcopy(new_reward)
         t += 1
-    print("Episode:", i + 1, "Max length:", t, "Rewards:", reward)
+    #print("Episode:", i + 1, "Max length:", t, "Rewards:", reward)
     # sample one observation from each agent
     for j in range(4):
         eps_length = len(eps_observations[j])
@@ -156,6 +156,6 @@ for i in range(num_episodes):
         observations.append(observation_s)
         actions.append(action_s)
         rewards.append(reward_s)
-        if i % 100==0 and i!=0:
+        if i % 10000==0 and i!=0:
             out_file = 'test_data.npz'
             np.savez_compressed(out_file, observations=observations, actions=actions, rewards = rewards)

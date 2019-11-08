@@ -17,7 +17,6 @@ import os.path
 import random
 from pommerman import agents
 import pommerman
-from IPython.display import clear_output
 
 
 # # Hyperparameters
@@ -351,16 +350,16 @@ optimizer = torch.optim.Adam(model.parameters(),lr=lr)
 
 last_rewards,policy_losses,entropy_losses,value_losses,losses = [],[],[],[],[]
 frame_idx = 0
-for k in range(10):
+for k in range(10000):
     avg_rewards,avg_policy_losses,avg_entropy_losses,avg_value_losses,avg_losses = [],[],[],[],[]
-    for i in range(10):
+    for i in range(100):
         if i==0:
-            transitions = rollout(env,model,frame_idx,episode_type)
+            transitions = rollout(env,model,frame_idx)
         else:
-            transitions = np.concatenate((transitions,rollout(env,model,frame_idx,env,episode_type)),0)
+            transitions = np.concatenate((transitions,rollout(env,model,frame_idx,env)),0)
         avg_rewards.append(np.array(transitions).T[1][-1])
-    avg_reward = sum(avg_rewards)/10
-    for j in range(10):
+    avg_reward = sum(avg_rewards)/100
+    for j in range(100):
         transition = np.array(random.sample(list(transitions),1))
         state = np.array(transition).T[0]
         reward = np.array(transition).T[1]
@@ -376,17 +375,17 @@ for k in range(10):
         avg_entropy_losses.append(losss[1])
         avg_value_losses.append(losss[2])
         avg_losses.append(losss[3])
-    avg_policy_losses = sum(avg_policy_losses)/10
-    avg_entropy_losses = sum(avg_entropy_losses)/10
-    avg_value_losses = sum(avg_value_losses)/10
-    avg_losses = sum(avg_losses)/10
+    avg_policy_losses = sum(avg_policy_losses)/100
+    avg_entropy_losses = sum(avg_entropy_losses)/100
+    avg_value_losses = sum(avg_value_losses)/100
+    avg_losses = sum(avg_losses)/100
     frame_idx+=1
     last_rewards.append(avg_reward)
     policy_losses.append(avg_policy_losses)
     entropy_losses.append(avg_entropy_losses)
     value_losses.append(avg_value_losses)
     losses.append(avg_losses)
-    clear_output()
+    print(last_rewards)
     #plot_results(last_rewards,policy_losses,entropy_losses,value_losses,losses)
     with open("training.txt", "a") as f: print('reward of',i,'=',last_rewards, file=f)
     folder_name = 'model4'
