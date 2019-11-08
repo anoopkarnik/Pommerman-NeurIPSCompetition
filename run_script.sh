@@ -8,3 +8,6 @@ python imitation.py
 
 echo "running reinforcement learning model"
 python train.py
+
+echo "starting agent"
+python run.py

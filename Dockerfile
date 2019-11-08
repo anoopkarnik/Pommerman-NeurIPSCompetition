@@ -8,6 +8,8 @@ ADD train.py /
 
 ADD run_script.sh /
 
+ADD run.py /
+
 RUN pip install --upgrade pip
 
 RUN git clone https://github.com/MultiAgentLearning/playground ~/playground
